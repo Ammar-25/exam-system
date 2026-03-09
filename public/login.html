@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exam System - Login</title>
+    <link rel="icon" type="image/png" href="assets/examImg.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <p class="login-header">Sign In</p>
+      <p class="login-paragraph">
+        Enter your credentials to access your account
+      </p>
+      <form action="" class="login-form" id="login-form">
+        <p class="error-msg" id="error-msg"></p>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Email"
+          required
+          class="txt-field"
+        />
+        <div class="password-input">
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Password"
+            required
+            class="txt-field"
+          />
+          <button type="button" class="show-password" onclick="showPass()">
+            <img
+              src="assets/visible.png"
+              alt="show"
+              width="20px"
+              height="20px"
+              id="eye"
+            />
+          </button>
+        </div>
+        <div
+          style="
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0px;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 5px">
+            <input type="checkbox" name="remember-me" id="remember-me" />
+            <span onclick="checkRem()" style="cursor: pointer"
+              >Remember me</span
+            >
+          </div>
+          <a href="/register.html" class="login-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="login-button" id="login-button">
+          Login
+        </button>
+      </form>
+      <span class="login-span">
+        Don't have an account?
+        <a href="/register" class="login-link">Register</a>
+      </span>
+    </div>
+  </body>
+  <script>
+    // attributes
+    let form = document.getElementById("login-form");
+    let LoginButton = document.getElementById("login-button");
+    let error_msg = document.getElementById("error-msg");
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+    let rememberMe = document.getElementById("remember-me");
+
+    rememberMe.addEventListener("change", function () {
+      console.log(rememberMe.value);
+    });
+
+    // functions
+    function showPass() {
+      var x = document.getElementById("password");
+      var img = document.getElementById("eye");
+
+      if (x.type === "password") {
+        x.type = "text";
+        img.src = "assets/hidden.png";
+      } else {
+        x.type = "password";
+        img.src = "assets/visible.png";
+      }
+    }
+
+    function checkRem() {
+      var x = document.getElementById("remember-me");
+      if (x.checked === true) {
+        x.checked = false;
+      } else {
+        x.checked = true;
+      }
+    }
+
+    function Authenticate() {}
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      let email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+      let error_msg = document.getElementById("error-msg");
+
+      if (!email || !password) {
+        error_msg.innerHTML = "❌ Please fill in all fields!";
+        return;
+      }
+
+      if (password.length < 8) {
+        error_msg.innerHTML = `❌ Password must be at least 8 characters!`;
+        error_msg.style.display = "block";
+        return;
+      }
+    });
+  </script>
+</html>
