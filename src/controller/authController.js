@@ -69,8 +69,10 @@ const login = (req, res) => {
       path: "/refresh",
       sameSite: "strict",
       secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      ...(rememberMe ? { maxAge: 7 * 24 * 60 * 60 * 1000 } : {}),
     });
+
+    console.log(rememberMe);
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
