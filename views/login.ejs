@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam System - Login</title>
+  <link rel="icon" type="image/png" href="/assets/examImg.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <p class="login-header">Sign In</p>
+    <p class="login-paragraph">
+      Enter your credentials to access your account
+    </p>
+    <form action="" class="login-form" id="login-form">
+      <div class="input-div">
+        <input type="email" name="email" id="email" placeholder="Email" required class="txt-field" />
+      </div>
+
+      <div class="input-div">
+        <input type="password" name="password" id="password" placeholder="Password" required class="txt-field" />
+        <button type="button" class="show-password" onclick="showPass()">
+          <img src="/assets/visible.png" alt="show" width="20px" height="20px" id="eye" />
+        </button>
+      </div>
+      <div class="error-container" id="error-msg">Error</div>
+      <div style="
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0px;
+            gap: 10px;
+          ">
+        <div style="display: flex; align-items: center; gap: 5px">
+          <input type="checkbox" id="remember-me" />
+          <label for="remember-me">Remember Me</label>
+        </div>
+        <a href="/register.html" class="login-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="login-button" id="login-button">
+        Login
+      </button>
+    </form>
+    <span class="login-span">
+      Don't have an account?
+      <a href="/register" class="login-link">Register</a>
+    </span>
+  </div>
+</body>
+<script src="/script.js"></script>
+<script>
+  // attributes
+  let form = document.getElementById("login-form");
+  let LoginButton = document.getElementById("login-button");
+  let error_msg = document.getElementById("error-msg");
+  let email = document.getElementById("email");
+  let password = document.getElementById("password");
+  let rememberMe = document.getElementById("remember-me");
+  let loading = false;
+
+  // functions
+  async function Authenticate() {
+    loading = true;
+    error_msg.innerHTML = "";
+    error_msg.style.opacity = 0;
+    error_msg.style.display = "none";
+    LoginButton.innerHTML = "Authenticating...";
+
+    try {
+      data = {
+        email: email.value,
+        password: password.value,
+        rememberMe: rememberMe.checked,
+      };
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (result.success) {
+        window.location.href = "/";
+      } else {
+        error_msg.innerHTML = result.message;
+        error_msg.style.opacity = 1;
+        error_msg.style.display = "block";
+        LoginButton.innerHTML = "Login";
+        loading = false;
+      }
+    } catch (error) {
+      error_msg.innerHTML = error.message;
+      error_msg.style.opacity = 1;
+      error_msg.style.display = "block";
+      LoginButton.innerHTML = "Login";
+      loading = false;
+    }
+  }
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    Authenticate();
+  });
+</script>
+
+</html>

@@ -40,14 +40,8 @@ p {
   flex-direction: column;
   align-items: center;
 }
-.txt-fields {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .txt-field {
-  width: 90%;
+  width: 100%;
   height: 25px;
   padding: 10px 12px;
   border: solid 1px gray;
@@ -58,7 +52,7 @@ p {
   outline: none;
 }
 
-.password-input {
+.input-div {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -102,10 +96,31 @@ p {
   width: 18px;
   height: 18px;
 }
-.error-msg {
-  color: red;
+
+.error-container {
+  background-color: #eb4c4c;
+  width: max-content;
+  display: flex;
+  justify-content: start;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
   font-size: smaller;
-  margin: 5px 0px 0px 5px;
-  align-self: flex-start;
+  width: stretch;
+  padding: 7px 10px;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
   display: none;
+}
+.names-input {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+}
+
+#grade {
+  padding: 7px 15px;
+  border-radius: 5px;
+  font-size: large;
+  width: 100%;
 }

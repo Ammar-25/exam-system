@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam System - Register</title>
+  <link rel="icon" type="image/png" href="/assets/examImg.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <p class="login-header">Register</p>
+    <p class="login-paragraph">Enter your data</p>
+    <form action="" class="login-form" id="login-form">
+      <div class="names-input">
+        <input type="text" name="first_name" id="first_name" placeholder="First Name" required class="txt-field" />
+        <input type="text" name="second_name" id="second_name" placeholder="Second Name" required class="txt-field" />
+      </div>
+      <div class="input-div">
+        <input type="email" name="email" id="email" placeholder="Email" required class="txt-field" />
+      </div>
+
+      <div class="input-div">
+        <input type="password" name="password" id="password" placeholder="Password" required class="txt-field" />
+        <button type="button" class="show-password" onclick="showPass()">
+          <img src="/assets/visible.png" alt="show" width="20px" height="20px" id="eye" />
+        </button>
+      </div>
+      <div class="error-container" id="error-msg">Error</div>
+
+      <label for="grade">Choose your grade:</label>
+      <select id="grade" name="grade">
+        <option value="" disabled selected>Select a grade</option>
+        <% grades.forEach(item => { %>
+        <option value="<%= item.id %>">
+          <%= item.grade %>
+        </option>
+        <% }); %>
+      </select>
+
+      <button type="submit" class="login-button" id="login-button">
+        Register
+      </button>
+    </form>
+    <span class="login-span">
+      Have an account?
+      <a href="/login" class="login-link">Login</a>
+    </span>
+  </div>
+</body>
+<script src="/script.js"></script>
+<script>
+  let Form = document.getElementById("login-form");
+  let ErrorMsg = document.getElementById("error-msg");
+  let RegisterButton = document.getElementById("login-button");
+
+  // form inputs
+  let firstName = document.getElementById("first_name");
+  let secondName = document.getElementById("second_name");
+  let email = document.getElementById("email");
+  let password = document.getElementById("password");
+  let grade = document.getElementById("grade");
+
+  async function Register() {
+    ErrorMsg.innerHTML = "";
+    ErrorMsg.style.opacity = 0;
+    ErrorMsg.style.display = "none";
+    RegisterButton.innerHTML = "Registering...";
+
+    if (
+      !firstName.value ||
+      !secondName.value ||
+      !email.value ||
+      !password.value ||
+      !grade.value
+    ) {
+      ErrorMsg.innerHTML = "Please fill all fields";
+      ErrorMsg.style.opacity = 1;
+      ErrorMsg.style.display = "block";
+      RegisterButton.innerHTML = "Register";
+      return;
+    }
+
+    if (password.value.length < 8) {
+      ErrorMsg.innerHTML = "Password must be at least 8 characters";
+      ErrorMsg.style.opacity = 1;
+      ErrorMsg.style.display = "block";
+      RegisterButton.innerHTML = "Register";
+      return;
+    }
+
+    try {
+      data = {
+        first_name: firstName.value,
+        second_name: secondName.value,
+        email: email.value,
+        password: password.value,
+        grade: grade.value,
+      };
+      const response = await fetch("/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (result.success) {
+        window.location.href = "/login";
+      } else {
+        ErrorMsg.innerHTML = result.message;
+        ErrorMsg.style.opacity = 1;
+        ErrorMsg.style.display = "block";
+        RegisterButton.innerHTML = "Register";
+      }
+    } catch (error) {
+      ErrorMsg.innerHTML = error.message;
+      ErrorMsg.style.opacity = 1;
+      ErrorMsg.style.display = "block";
+      RegisterButton.innerHTML = "Register";
+    }
+  }
+
+  Form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    Register();
+  });
+</script>
+
+</html>
