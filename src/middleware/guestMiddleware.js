@@ -2,6 +2,11 @@ import jwt from "jsonwebtoken";
 
 const verifyGuest = (req, res, next) => {
   const accessToken = req.cookies.accessToken;
+
+  if (!accessToken) {
+    return next();
+  }
+
   if (!accessToken) {
     return next();
   }

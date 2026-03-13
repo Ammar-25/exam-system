@@ -7,7 +7,10 @@ import tokens from "../utils/tokens.js";
 const handleRefreshToken = (req, res) => {
   const cookies = req.cookies;
 
-  const redirectTo = req.query.redirectTo || "/";
+  const redirectTo =
+    req.query.redirectTo && req.query.redirectTo.startsWith("/")
+      ? req.query.redirectTo
+      : "/";
 
   if (!cookies || !cookies.refreshToken) {
     return res.redirect("/login");
@@ -42,8 +45,17 @@ const handleRefreshToken = (req, res) => {
 };
 
 const login = (req, res) => {
-  const { email, password, rememberMe } = req.body;
+  const { email, password, remember_me } = req.body;
   if (!email || !password) {
+    app.get("/login", (req, res) => {
+      // Check if the query parameter exists
+      const isRegistered = req.query.registered === "true";
+
+      res.render("login", {
+        toast: isRegistered,
+        message: isRegistered ? "Registered Successfully" : "",
+      });
+    });
     return res
       .status(400)
       .send({ success: false, message: "All fields are required" });
@@ -69,10 +81,8 @@ const login = (req, res) => {
       path: "/refresh",
       sameSite: "strict",
       secure: false,
-      ...(rememberMe ? { maxAge: 7 * 24 * 60 * 60 * 1000 } : {}),
+      ...(remember_me ? { maxAge: 7 * 24 * 60 * 60 * 1000 } : {}),
     });
-
-    console.log(rememberMe);
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -112,12 +122,13 @@ const register = (req, res) => {
       "INSERT INTO students (user_id, grade_id) VALUES (?, ?)",
     );
     student.run(userId, grade);
-
     return res
-      .status(201)
-      .send({ success: true, message: "User created successfully" });
+      .status(200)
+      .send({ success: true, message: "Registerd Successfully!" });
   } catch (error) {
-    return res.status(500).send({ success: false, message: error.message });
+    return res
+      .status(500)
+      .send({ success: false, message: "User with this email already exists" });
   }
 };
 

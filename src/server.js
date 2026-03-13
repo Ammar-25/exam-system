@@ -5,8 +5,8 @@ import authRoutes from "./routes/AuthRoutes.js";
 import cookieParser from "cookie-parser";
 import db from "./db.js";
 import authController from "../src/controller/authController.js";
-import verifyGuest from "./middleware/guestMiddleware.js";
 import verifyAuth from "./middleware/authMiddleware.js";
+import studentController from "../src/controller/studentController.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,21 +20,22 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../public")));
 
 app.get("/", verifyAuth, (req, res) => {
+  console.log(req.user);
   try {
-    let user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
-    let name = user.first_name + " " + user.second_name;
-    if (user.type === "teacher") {
-      return res.render("teacher-home.ejs", { user });
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+    if (user.type === "student") {
+      studentController.studentHome(req, res, user);
+    } else {
+      res.render("teacher-home.ejs", { user: user });
     }
-    return res.send("Hello " + name + "!");
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    return res.status(500).send({ success: false, message: error.message });
   }
 });
 
 app.get("/refresh/token", authController.handleRefreshToken);
 
-app.use("/", verifyGuest, authRoutes);
+app.use("/", authRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

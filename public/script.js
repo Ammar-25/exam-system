@@ -4,7 +4,7 @@ async function apiFetch(url, options = {}) {
 
   if (response.status === 401) {
     console.log("Token expired, attempting refresh...");
-    
+
     const refreshRes = await fetch("/refresh", {
       method: "POST",
       credentials: "include",
@@ -19,16 +19,16 @@ async function apiFetch(url, options = {}) {
   }
   return response;
 }
+function show_password() {
+  const passwordInput = document.getElementById("password");
+  const toggle_password = document.getElementById("toggle-password");
+  const passwordType = passwordInput.getAttribute("type");
 
-function showPass() {
-  var x = document.getElementById("password");
-  var img = document.getElementById("eye");
-
-  if (x.type === "password") {
-    x.type = "text";
-    img.src = "assets/hidden.png";
+  if (passwordType === "password") {
+    passwordInput.setAttribute("type", "text");
+    toggle_password.textContent = "Hide";
   } else {
-    x.type = "password";
-    img.src = "assets/visible.png";
+    passwordInput.setAttribute("type", "password");
+    toggle_password.textContent = "Show";
   }
 }
