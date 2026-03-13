@@ -3,5 +3,5 @@
 logs
 *.log
 *.md
-database.db
 test.rest
+database.db
