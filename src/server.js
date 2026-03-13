@@ -20,7 +20,6 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../public")));
 
 app.get("/", verifyAuth, (req, res) => {
-  console.log(req.user);
   try {
     const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
     if (user.type === "student") {

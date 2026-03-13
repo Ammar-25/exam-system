@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const router = express.Router();
 
-router.get("/login", (req, res) => {
+router.get("/login", verifyGuest, (req, res) => {
   const isRegistered = req.query.registered === "true";
 
   res.render("login", {
