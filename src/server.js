@@ -28,7 +28,10 @@ app.get("/", verifyAuth, (req, res) => {
       res.render("teacher-home.ejs", { user: user });
     }
   } catch (error) {
-    return res.status(500).send({ success: false, message: error.message });
+    return res.render("/login", {
+      toast: true,
+      message: "Something went wrong",
+    });
   }
 });
 
