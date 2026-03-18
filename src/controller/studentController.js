@@ -1,17 +1,46 @@
 import db from "../db.js";
 
 const studentHome = (req, res, user) => {
-  const query = db
-    .prepare(
-      `
-        SELECT s.id AS subject_id, s.name AS subject_name
-        FROM subjects s
-        JOIN students st ON s.grade_id = st.grade_id
-        WHERE st.user_id = ?
+  if (!user) {
+    console.error("Error: user.grade_id is undefined");
+    return res.status(400).send("User grade information missing.");
+  }
+
+  try {
+    const student = db
+      .prepare(`SELECT * FROM students WHERE user_id = ?`)
+      .get(user.id);
+    if (!student || !student.grade_id) {
+      console.error("Error: student grade is undefined");
+      return res.status(400).send("User grade information missing.");
+    }
+    const countResult = db
+      .prepare(
+        `
+        SELECT COUNT(exams.id) as count FROM exams
+        JOIN subjects ON exams.subject_id = subjects.id
+        WHERE subjects.grade_id = ?
+        AND exams.id NOT IN (
+          SELECT exam_id FROM exam_sessions WHERE student_id = ?
+        )
       `,
-    )
-    .all(user.id);
-  res.render("student-home.ejs", { user: user, subjects: query });
+      )
+      .get(student.grade_id, user.id);
+
+    const notification = db
+      .prepare("SELECT * FROM notifications WHERE user_id = ?")
+      .all(user.id);
+    res.render("student-home.ejs", {
+      user: user,
+      examsToAttend: countResult.count,
+      notifications: notification,
+    });
+  } catch (error) {
+    return res.render("/login", {
+      toast: true,
+      message: "Something went wrong",
+    });
+  }
 };
 
 export default { studentHome };

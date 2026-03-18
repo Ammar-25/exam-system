@@ -29,4 +29,14 @@ router.post("/login", verifyGuest, authController.login);
 
 router.post("/register", verifyGuest, authController.register);
 
+router.post("/logout", (req, res) => {
+  try {
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    res.sendStatus(200).send({ success: true, message: "Logged out" });
+  } catch (error) {
+    return res.status(500).send({ success: false, message: error.message });
+  }
+});
+
 export default router;
