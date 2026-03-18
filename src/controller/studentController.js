@@ -30,10 +30,14 @@ const studentHome = (req, res, user) => {
     const notification = db
       .prepare("SELECT * FROM notifications WHERE user_id = ?")
       .all(user.id);
+
+    const unreadCount = notification.filter((n) => n.read === 0).length;
+
     res.render("student-home.ejs", {
       user: user,
       examsToAttend: countResult.count,
       notifications: notification,
+      unreadCount: unreadCount,
     });
   } catch (error) {
     return res.render("/login", {
