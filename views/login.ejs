@@ -14,18 +14,25 @@
 
 
   <% if (toast) { %>
-  <div id="toast-success" class="fixed top-5 right-5 z-50 flex w-full max-w-sm items-center gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 shadow-xl transition-all duration-500 transform translate-x-0 opacity-100" role="alert">
+  <% const isSuccess = (type !== 'error' && type !== false); %>
 
-    <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/20 text-green-400">
+  <div id="toast-message" class="fixed top-5 right-5 z-50 flex w-full max-w-sm items-center gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 shadow-xl transition-all duration-500 transform translate-x-0 opacity-100" role="alert">
+
+    <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg <%= isSuccess ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' %>">
+      <% if (isSuccess) { %>
       <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5" />
       </svg>
-      <span class="sr-only">Success icon</span>
+      <% } else { %>
+      <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+      <% } %>
     </div>
 
     <div class="flex-1">
-      <h3 class="text-sm font-semibold text-gray-100">Success!</h3>
-      <p class="text-sm text-gray-400"><%= typeof message !== 'undefined' ? message : 'Action completed successfully.' %></p>
+      <h3 class="text-sm font-semibold text-gray-100"><%= isSuccess ? 'Success!' : 'Error!' %></h3>
+      <p class="text-sm text-gray-400"><%= typeof message !== 'undefined' ? message : (isSuccess ? 'Action completed successfully.' : 'An error occurred.') %></p>
     </div>
 
     <button type="button" onclick="closeToast()" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-600" aria-label="Close">
@@ -105,7 +112,7 @@
 <!-- Toast -->
 <script>
   function closeToast() {
-    const toast = document.getElementById('toast-success');
+    const toast = document.getElementById('toast-message');
     if (toast) {
       toast.classList.remove('translate-x-0', 'opacity-100');
       toast.classList.add('translate-x-full', 'opacity-0');
@@ -117,7 +124,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const toast = document.getElementById('toast-success');
+    const toast = document.getElementById('toast-message');
     if (toast) {
       setTimeout(() => {
         closeToast();
@@ -162,7 +169,11 @@
       const resData = await response.json();
 
       if (resData.success) {
-        window.location.href = '/';
+        if (resData.type == "student") {
+          window.location.href = '/student/dashboard';
+        } else if (resData.type == "teacher") {
+          window.location.href = '/teacher/dashboard';
+        }
       } else {
         error_msg.classList.remove('hidden');
         error_msg.textContent = resData.message;

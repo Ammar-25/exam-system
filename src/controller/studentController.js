@@ -1,19 +1,35 @@
 import db from "../db.js";
 
-const studentHome = (req, res, user) => {
-  if (!user) {
-    console.error("Error: user.grade_id is undefined");
-    return res.status(400).send("User grade information missing.");
+const studentDashboard = (req, res) => {
+  let toast = false;
+  let type = "success";
+  let message = "Success";
+  if (req.query.toast === "true" && req.query.type && req.query.message) {
+    toast = true;
+    type = req.query.type;
+    message = req.query.message;
   }
 
   try {
-    const student = db
-      .prepare(`SELECT * FROM students WHERE user_id = ?`)
-      .get(user.id);
-    if (!student || !student.grade_id) {
-      console.error("Error: student grade is undefined");
-      return res.status(400).send("User grade information missing.");
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+    if (!user) {
+      return res.render("index.ejs", {
+        toast: true,
+        type: "error",
+        message: "User not found.",
+      });
     }
+    const student = db
+      .prepare("SELECT * FROM students WHERE user_id = ?")
+      .get(user.id);
+    if (!student) {
+      return res.render("index.ejs", {
+        toast: true,
+        type: "error",
+        message: "Student profile not found.",
+      });
+    }
+
     const countResult = db
       .prepare(
         `
@@ -38,13 +54,93 @@ const studentHome = (req, res, user) => {
       examsToAttend: countResult.count,
       notifications: notification,
       unreadCount: unreadCount,
+      toast: toast,
+      type: type,
+      message: message,
     });
   } catch (error) {
-    return res.render("/login", {
+    console.error(error);
+    return res.render("index.ejs", {
       toast: true,
-      message: "Something went wrong",
+      type: "error",
+      message: "Something went wrong retrieving the profile.",
     });
   }
 };
 
-export default { studentHome };
+const studentProfile = (req, res) => {
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+
+    if (!user) {
+      return res.render("index.ejs", {
+        toast: true,
+        type: "error",
+        message: "User not found.",
+      });
+    }
+
+    const student = db
+      .prepare("SELECT * FROM students WHERE user_id = ?")
+      .get(user.id);
+    if (!student) {
+      return res.render("student-home.ejs", {
+        toast: true,
+        type: "error",
+        message: "Student profile not found.",
+      });
+    }
+
+    const grade = db
+      .prepare("SELECT * FROM grades WHERE id = ?")
+      .get(student.grade_id);
+
+    const subjects_count = db
+      .prepare("SELECT COUNT(*) as count FROM subjects WHERE grade_id = ?")
+      .get(student.grade_id);
+
+    const exams = db
+      .prepare(
+        `SELECT COUNT(DISTINCT exam_id) as count FROM exam_sessions WHERE student_id = ?`,
+      )
+      .get(user.id);
+
+    const statement = db
+      .prepare(
+        `
+        SELECT 
+            AVG(
+                (es.score * 100.0) / 
+                NULLIF((
+                    SELECT SUM(o.marks)
+                    FROM questions q
+                    JOIN options o ON q.id = o.question_id
+                    WHERE q.exam_id = es.exam_id AND o.is_correct = 1
+                ), 0)
+            ) as average_percentage
+        FROM exam_sessions es
+        WHERE es.student_id = ? AND es.score IS NOT NULL;
+    `,
+      )
+      .get(user.id);
+
+    const averagePercentage = statement.average_percentage;
+
+    return res.render("student-profile.ejs", {
+      user: user,
+      student: student,
+      grade: grade,
+      subjects_count: subjects_count.count,
+      exams: exams.count,
+      averagePercentage: averagePercentage,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.render("student-home.ejs", {
+      toast: true,
+      type: "error",
+      message: "Something went wrong retrieving the profile.",
+    });
+  }
+};
+export default { studentDashboard, studentProfile };

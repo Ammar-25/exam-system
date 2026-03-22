@@ -1,8 +1,6 @@
 import express from "express";
 import path from "path";
-import bcrypt from "bcryptjs";
 import db from "../db.js";
-import jwt from "jsonwebtoken";
 import { fileURLToPath } from "url";
 import authController from "../controller/authController.js";
 import verifyGuest from "../middleware/guestMiddleware.js";
@@ -16,6 +14,7 @@ router.get("/login", verifyGuest, (req, res) => {
 
   res.render("login", {
     toast: isRegistered,
+    type: "success",
     message: isRegistered ? "Registered Successfully" : "",
   });
 });

@@ -1,5 +1,4 @@
 async function apiFetch(url, options = {}) {
-  options.credentials = "include";
   let response = await fetch(url, options);
 
   if (response.status === 401) {
@@ -7,7 +6,6 @@ async function apiFetch(url, options = {}) {
 
     const refreshRes = await fetch("/refresh", {
       method: "POST",
-      credentials: "include",
     });
 
     if (refreshRes.status === 200) {

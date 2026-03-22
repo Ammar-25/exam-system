@@ -6,10 +6,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Exam System - Home</title>
   <link rel="icon" type="image/png" href="/assets/examImg.png" />
-  <link href="./output.css" rel="stylesheet">
+  <link href="/output.css" rel="stylesheet">
 </head>
 
 <body class="h-full text-white">
+
+  <% if (typeof toast !== 'undefined' && toast) { %>
+  <% const isSuccess = (type !== 'error' && type !== false); %>
+
+  <div id="toast-message" class="fixed top-5 right-5 z-9999 flex w-full max-w-sm items-center gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 shadow-xl transition-all duration-500 transform translate-x-0 opacity-100" role="alert">
+
+    <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg <%= isSuccess ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' %>">
+      <% if (isSuccess) { %>
+      <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5" />
+      </svg>
+      <% } else { %>
+      <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+      <% } %>
+    </div>
+
+    <div class="flex-1">
+      <h3 class="text-sm font-semibold text-gray-100"><%= isSuccess ? 'Success!' : 'Error!' %></h3>
+      <p class="text-sm text-gray-400"><%= typeof message !== 'undefined' ? message : (isSuccess ? 'Action completed successfully.' : 'An error occurred.') %></p>
+    </div>
+
+    <button type="button" onclick="closeToast()" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-600" aria-label="Close">
+      <span class="sr-only">Close</span>
+      <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+      </svg>
+    </button>
+  </div>
+  <% } %>
 
   <nav class="border-b border-white/10 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -27,7 +58,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
               <!-- Red badge -->
+              <% if (unreadCount > 0) { %>
               <span id="notif-badge" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"> <%- unreadCount %> </span>
+              <% } %>
             </button>
 
             <!-- Dropdown -->
@@ -155,7 +188,7 @@
         </div>
       </a>
 
-      <a href="/profile" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white/5 p-6 border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all duration-300">
+      <a href="/student/profile" class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white/5 p-6 border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all duration-300">
         <div>
           <div class="group-hover:rotate-2 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 mb-4 group-hover:scale-110 transition-transform">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -254,6 +287,30 @@
       }
     }
   </script>
+  <!-- Toast -->
+  <script>
+    function closeToast() {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        toast.classList.remove('translate-x-0', 'opacity-100');
+        toast.classList.add('translate-x-full', 'opacity-0');
+
+        setTimeout(() => {
+          toast.remove();
+        }, 500);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        setTimeout(() => {
+          closeToast();
+        }, 4000);
+      }
+    });
+  </script>
+
 </body>
 
 </html>
