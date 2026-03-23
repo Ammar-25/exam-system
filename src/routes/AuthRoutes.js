@@ -12,7 +12,7 @@ const router = express.Router();
 router.get("/login", verifyGuest, (req, res) => {
   const isRegistered = req.query.registered === "true";
 
-  res.render("login", {
+  res.render("auth/login", {
     toast: isRegistered,
     type: "success",
     message: isRegistered ? "Registered Successfully" : "",
@@ -21,7 +21,7 @@ router.get("/login", verifyGuest, (req, res) => {
 
 router.get("/register", verifyGuest, (req, res) => {
   let grades = db.prepare("SELECT * FROM grades").all();
-  res.render("register.ejs", { grades });
+  res.render("auth/register", { grades });
 });
 
 router.post("/login", verifyGuest, authController.login);

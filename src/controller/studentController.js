@@ -47,7 +47,7 @@ const studentDashboard = (req, res) => {
       .prepare("SELECT * FROM notifications WHERE user_id = ? AND read = 0")
       .all(user.id);
 
-    res.render("student-home.ejs", {
+    res.render("student/student-home", {
       user: user,
       examsToAttend: countResult.count,
       notifications: notification,
@@ -57,7 +57,7 @@ const studentDashboard = (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.render("index.ejs", {
+    return res.render("index", {
       toast: true,
       type: "error",
       message: "Something went wrong retrieving the profile.",
@@ -127,7 +127,7 @@ const studentProfile = (req, res) => {
       .prepare("SELECT * FROM notifications WHERE user_id = ? AND read = 0")
       .all(user.id);
 
-    return res.render("student-profile.ejs", {
+    return res.render("student/student-profile", {
       user: user,
       student: student,
       grade: grade,
@@ -138,7 +138,7 @@ const studentProfile = (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.render("student-home.ejs", {
+    return res.render("student/student-home", {
       toast: true,
       type: "error",
       message: "Something went wrong retrieving the profile.",

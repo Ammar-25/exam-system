@@ -106,7 +106,7 @@ const login = (req, res) => {
       // Check if the query parameter exists
       const isRegistered = req.query.registered === "true";
 
-      res.render("login", {
+      res.render("auth/login", {
         toast: isRegistered,
         message: isRegistered ? "Registered Successfully" : "",
       });
