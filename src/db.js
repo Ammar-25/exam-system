@@ -4,7 +4,6 @@ const db = new DatabaseSync("database.db");
 db.exec("PRAGMA foreign_keys = ON;");
 
 // users
-// users
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,

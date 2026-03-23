@@ -58,8 +58,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
               <!-- Red badge -->
-              <% if (unreadCount > 0) { %>
-              <span id="notif-badge" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"> <%- unreadCount %> </span>
+              <% if (notifications.length > 0) { %>
+              <span id="notif-badge" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"> <%- notifications.length %> </span>
               <% } %>
             </button>
 
@@ -75,7 +75,6 @@
               <ul class="divide-y divide-white/10 max-h-72 overflow-y-auto" id="notif-list">
                 <% if (notifications && notifications.length > 0) { %>
                 <% notifications.forEach(notification => { %>
-                <% if (notification.read) { %>
                 <li class="flex gap-3 px-4 py-3 bg-indigo-500/5 hover:bg-white/5 transition-colors notif-item unread">
                   <div class="mt-1 flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400 self-start mt-2"></div>
                   <div class="flex-1 min-w-0">
@@ -84,16 +83,6 @@
                     <!-- <p class="text-xs text-gray-500 mt-1">2 hours ago</p> -->
                   </div>
                 </li>
-                <% } else { %>
-                <li class="flex gap-3 px-4 py-3 hover:bg-white/5 transition-colors notif-item read">
-                  <div class="mt-1 flex-shrink-0 h-2 w-2 rounded-full bg-transparent self-start mt-2"></div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-300"> <%- notification.message %> </p>
-                    <p class="text-xs text-gray-500 mt-0.5 "> <%- notification.title %> </p>
-                    <!-- <p class="text-xs text-gray-600 mt-1">1 week ago</p> -->
-                  </div>
-                </li>
-                <% } %>
                 <% }) %>
                 <% } else { %>
                 <li class="px-4 py-6 text-center text-sm text-gray-500">
@@ -205,111 +194,9 @@
 
     </div>
 
-    <!-- <div class="mt-12">
-      <h2 class="text-xl font-bold tracking-tight text-white mb-6">Recent Exams</h2>
-      <div class="overflow-hidden rounded-xl border border-white/10 bg-white/5">
-        <ul role="list" class="divide-y divide-white/10">
-          <li class="flex items-center justify-between gap-x-6 p-5 hover:bg-white/5 transition-colors">
-            <div class="min-w-0">
-              <div class="flex items-start gap-x-3">
-                <p class="text-sm font-semibold leading-6 text-white">Introduction to Computer Science</p>
-                <p class="rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset text-green-400 bg-green-400/10 ring-green-400/20">Graded</p>
-              </div>
-              <div class="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-400">
-                <p>Completed on <time datetime="2023-10-15">Oct 15, 2023</time></p>
-                <svg viewBox="0 0 2 2" class="h-0.5 w-0.5 fill-current">
-                  <circle cx="1" cy="1" r="1" />
-                </svg>
-                <p class="truncate">Score: 92/100</p>
-              </div>
-            </div>
-            <div class="flex flex-none items-center gap-x-4">
-              <a href="/results/1" class="hidden sm:block rounded-md bg-white/10 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-white/20">View Details</a>
-            </div>
-          </li>
-
-          <li class="flex items-center justify-between gap-x-6 p-5 hover:bg-white/5 transition-colors">
-            <div class="min-w-0">
-              <div class="flex items-start gap-x-3">
-                <p class="text-sm font-semibold leading-6 text-white">Advanced Mathematics - Midterm</p>
-                <p class="rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset text-amber-400 bg-amber-400/10 ring-amber-400/20">Pending Review</p>
-              </div>
-              <div class="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-400">
-                <p>Completed on <time datetime="2023-10-20">Oct 20, 2023</time></p>
-              </div>
-            </div>
-            <div class="flex flex-none items-center gap-x-4">
-              <span class="text-sm text-gray-500 italic">Waiting for professor</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div> -->
-
   </main>
 
-  <script>
-    function toggleNotif() {
-      const dropdown = document.getElementById('notif-dropdown');
-      dropdown.classList.toggle('hidden');
-    }
-
-    function markAllRead() {
-      document.querySelectorAll('.notif-item.unread').forEach(item => {
-        item.classList.remove('unread', 'bg-indigo-500/5');
-        item.querySelector('.rounded-full.bg-indigo-400')?.classList.replace('bg-indigo-400', 'bg-transparent');
-      });
-      const badge = document.getElementById('notif-badge');
-      badge.classList.add('hidden');
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      const wrapper = document.getElementById('notif-wrapper');
-      if (!wrapper.contains(e.target)) {
-        document.getElementById('notif-dropdown').classList.add('hidden');
-      }
-    });
-  </script>
-
-  <script>
-    async function logout() {
-      try {
-        const response = await fetch('/logout', {
-          method: 'POST'
-        });
-        if (response.ok) {
-          window.location.href = '/login';
-        }
-      } catch (error) {
-        console.error('Logout failed:', error);
-        window.location.href = '/login';
-      }
-    }
-  </script>
-  <!-- Toast -->
-  <script>
-    function closeToast() {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.classList.remove('translate-x-0', 'opacity-100');
-        toast.classList.add('translate-x-full', 'opacity-0');
-
-        setTimeout(() => {
-          toast.remove();
-        }, 500);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        setTimeout(() => {
-          closeToast();
-        }, 4000);
-      }
-    });
-  </script>
+  <script src="/script.js"></script>
 
 </body>
 

@@ -44,16 +44,13 @@ const studentDashboard = (req, res) => {
       .get(student.grade_id, user.id);
 
     const notification = db
-      .prepare("SELECT * FROM notifications WHERE user_id = ?")
+      .prepare("SELECT * FROM notifications WHERE user_id = ? AND read = 0")
       .all(user.id);
-
-    const unreadCount = notification.filter((n) => n.read === 0).length;
 
     res.render("student-home.ejs", {
       user: user,
       examsToAttend: countResult.count,
       notifications: notification,
-      unreadCount: unreadCount,
       toast: toast,
       type: type,
       message: message,
@@ -126,13 +123,18 @@ const studentProfile = (req, res) => {
 
     const averagePercentage = statement.average_percentage;
 
+    const notifications = db
+      .prepare("SELECT * FROM notifications WHERE user_id = ? AND read = 0")
+      .all(user.id);
+
     return res.render("student-profile.ejs", {
       user: user,
       student: student,
       grade: grade,
-      subjects_count: subjects_count.count,
-      exams: exams.count,
-      averagePercentage: averagePercentage,
+      subjects_count: subjects_count.count || 0,
+      exams: exams.count || 0,
+      averagePercentage: averagePercentage || 0,
+      notifications: notifications || [],
     });
   } catch (error) {
     console.error(error);
