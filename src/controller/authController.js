@@ -154,7 +154,7 @@ const register = (req, res) => {
     if (user) {
       return res
         .status(400)
-        .send({ success: false, message: "User already exists" });
+        .send({ success: false, message: ["User already exists"] });
     }
     const hashedPassword = bcrypt.hashSync(password, 10);
     const user_id = uuidv7();
@@ -181,6 +181,7 @@ const register = (req, res) => {
       .status(201)
       .send({ success: true, message: "User created successfully" });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({ success: false, message: [error.message] });
   }
 };

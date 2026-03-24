@@ -16,4 +16,16 @@ studentRouter.post(
   studentController.changePassword,
 );
 
+studentRouter.post(
+  "/mark-one-read/:id",
+  verifyAPIAuth,
+  studentController.markAsRead,
+);
+
+studentRouter.post(
+  "/mark-all-read",
+  verifyAPIAuth,
+  studentController.markAllAsRead,
+);
+
 export default studentRouter;
