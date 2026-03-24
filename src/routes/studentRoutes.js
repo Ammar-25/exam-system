@@ -8,10 +8,7 @@ studentRouter.get("/dashboard", verifyAuth, studentController.studentDashboard);
 
 studentRouter.get("/profile", verifyAuth, studentController.studentProfile);
 
-studentRouter.post("/updateInfo", verifyAPIAuth, (req, res) => {
-  console.log(req.body);
-  return res.sendStatus(200);
-});
+studentRouter.post("/updateInfo", verifyAPIAuth, studentController.updateInfo);
 
 studentRouter.post(
   "/changePassword",

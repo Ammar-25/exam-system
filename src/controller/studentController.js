@@ -183,7 +183,6 @@ const changePassword = (req, res) => {
     return res
       .status(200)
       .send({ success: true, message: "Password changed successfully" });
-    
   } catch (error) {
     console.error(error);
     return res
@@ -192,4 +191,20 @@ const changePassword = (req, res) => {
   }
 };
 
-export default { studentDashboard, studentProfile, changePassword };
+const updateInfo = (req, res) => {
+  let { first_name, second_name, gender } = req.body;
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+    db.prepare(
+      "UPDATE users SET first_name = ?, second_name = ?, gender = ? WHERE id = ?",
+    ).run(first_name, second_name, gender, user.id);
+    return res
+      .status(200)
+      .send({ success: true, message: "Profile updated successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+export default { studentDashboard, studentProfile, changePassword, updateInfo };
