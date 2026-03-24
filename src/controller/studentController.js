@@ -207,4 +207,37 @@ const updateInfo = (req, res) => {
   }
 };
 
-export default { studentDashboard, studentProfile, changePassword, updateInfo };
+const markAsRead = (req, res) => {
+  try {
+    const notificationId = req.params.id;
+    db.prepare("UPDATE notifications SET read = 1 WHERE id = ?").run(
+      notificationId,
+    );
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const markAllAsRead = (req, res) => {
+  try {
+    const notificationId = req.params.id;
+    db.prepare(
+      "UPDATE notifications SET read = 1 WHERE read = 0 AND user_id = ?",
+    ).run(req.user);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export default {
+  studentDashboard,
+  studentProfile,
+  changePassword,
+  updateInfo,
+  markAsRead,
+  markAllAsRead,
+};

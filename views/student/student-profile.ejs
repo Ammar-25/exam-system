@@ -71,6 +71,8 @@
 <body class="h-full text-white bg-gray-900">
 
   <%- include("../components/navbar") %>
+  <%- include("../components/toast") %>
+
 
   <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
@@ -129,7 +131,7 @@
               <span class="text-[10px] text-gray-400 mt-0.5 text-center leading-tight">Exams</span>
             </div>
             <div class="flex flex-col items-center py-3 px-2">
-              <% if (typeof averagePercentage === 'number' && !isNaN(averagePercentage >= 50)) { %>
+              <% if (averagePercentage >= 50) { %>
               <span class="text-lg font-bold text-emerald-400"><%- (typeof averagePercentage === 'number' ? averagePercentage.toFixed(2) : 0)%> %</span>
               <% } else { %>
               <span class="text-lg font-bold text-red-400"><%- (typeof averagePercentage === 'number' ? averagePercentage.toFixed(2) : 0) %> %</span>
@@ -185,7 +187,7 @@
 
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">Last Name</label>
-              <input id="last-name" ype="text" value="Mohamed" class="rounded-lg border border-white/10 bg-gray-900/60 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors" />
+              <input id="last-name" ype="text" value="<%- user.second_name %>" class="rounded-lg border border-white/10 bg-gray-900/60 px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors" />
             </div>
 
             <div class="flex flex-col gap-1.5 sm:col-span-2">
@@ -364,17 +366,7 @@
     </div>
   </main>
 
-  <!-- Toast notification -->
-  <div id="toast" class="fixed bottom-6 right-6 z-[100] hidden">
-    <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-gray-800 px-4 py-3 shadow-xl">
-      <div id="toast-icon" class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 flex-shrink-0">
-        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-      <p id="toast-msg" class="text-sm font-medium text-white"></p>
-    </div>
-  </div>
+
 
   <!-- Delete Confirm Modal -->
   <div id="delete-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4">

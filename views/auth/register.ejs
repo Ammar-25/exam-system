@@ -153,6 +153,7 @@
 
   async function Register() {
     loading(true);
+    error_msg.innerHTML = "";
 
     if (
       !first_name.value ||
@@ -211,6 +212,7 @@
         loading(false);
       }
     } catch (error) {
+      console.error("Error:", error);
       error_msg.innerHTML = "An unexpected error occurred. Please try again.";
       error_msg.classList.remove("hidden");
       loading(false);

@@ -24,29 +24,30 @@
               <!-- Header -->
               <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <span class="text-sm font-semibold text-white">Notifications</span>
-                <button onclick="markAllRead()" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">Mark all as read</button>
+                <button onclick="markAllRead()" id="mark-all-read" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">Mark all as read</button>
               </div>
 
               <!-- Notification List -->
               <ul class="divide-y divide-white/10 max-h-72 overflow-y-auto" id="notif-list">
                 <% if (notifications && notifications.length > 0) { %>
-                <% notifications.forEach(notification => { %>
-                <li class="flex gap-3 px-4 py-3 bg-indigo-500/5 hover:bg-white/5 transition-colors notif-item unread">
-                  <div class="mt-1 flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400 self-start mt-2"></div>
+                <% notifications.forEach((notification) => { %>
+                <li class="flex gap-3 px-4 py-3 bg-indigo-500/5 hover:bg-white/5 transition-colors notif-item unread" id="notif-item-<%- notification.id %>">
+                  <div class="mt-2 flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400 self-start notif-dot"></div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-white"><%- notification.message %></p>
-                    <p class="text-xs text-gray-400 mt-0.5 "><%- notification.title %></p>
-                    <!-- <p class="text-xs text-gray-500 mt-1">2 hours ago</p> -->
+                    <p class="text-xs text-gray-400 mt-0.5"><%- notification.title %></p>
                   </div>
+                  <button onclick="markOneRead('<%- notification.id %>')" class="flex-shrink-0 self-start mt-1 text-xs text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/20 transition-colors px-2 py-0.5 rounded-full border border-indigo-500/30 cursor-pointer whitespace-nowrap">
+                    Mark read
+                  </button>
                 </li>
                 <% }) %>
                 <% } else { %>
                 <li class="px-4 py-6 text-center text-sm text-gray-500">
-                  You have no notifications.
+                  You have no unread notifications.
                 </li>
                 <% } %>
               </ul>
-
               <!-- Footer -->
               <div class="px-4 py-3 border-t border-white/10 text-center">
                 <a href="/notifications" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">View all notifications</a>
