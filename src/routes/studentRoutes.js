@@ -28,4 +28,6 @@ studentRouter.post(
   studentController.markAllAsRead,
 );
 
+studentRouter.delete("/delete", verifyAPIAuth, studentController.deleteStudent);
+
 export default studentRouter;

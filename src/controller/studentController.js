@@ -233,6 +233,24 @@ const markAllAsRead = (req, res) => {
   }
 };
 
+const deleteStudent = (req, res) => {
+  try {
+    const studentId = req.user;
+    db.prepare("DELETE FROM users WHERE id = ?").run(studentId);
+
+
+    res.clearCookie("refreshToken", { path: "/refresh" });
+    res.clearCookie("accessToken");
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Student deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export default {
   studentDashboard,
   studentProfile,
@@ -240,4 +258,5 @@ export default {
   updateInfo,
   markAsRead,
   markAllAsRead,
+  deleteStudent,
 };
