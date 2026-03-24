@@ -12,38 +12,7 @@
 
 <body class="h-full">
 
-
-  <% if (toast) { %>
-  <% const isSuccess = (type !== 'error' && type !== false); %>
-
-  <div id="toast-message" class="fixed top-5 right-5 z-50 flex w-full max-w-sm items-center gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 shadow-xl transition-all duration-500 transform translate-x-0 opacity-100" role="alert">
-
-    <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg <%= isSuccess ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' %>">
-      <% if (isSuccess) { %>
-      <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5" />
-      </svg>
-      <% } else { %>
-      <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-      </svg>
-      <% } %>
-    </div>
-
-    <div class="flex-1">
-      <h3 class="text-sm font-semibold text-gray-100"><%= isSuccess ? 'Success!' : 'Error!' %></h3>
-      <p class="text-sm text-gray-400"><%= typeof message !== 'undefined' ? message : (isSuccess ? 'Action completed successfully.' : 'An error occurred.') %></p>
-    </div>
-
-    <button type="button" onclick="closeToast()" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-600" aria-label="Close">
-      <span class="sr-only">Close</span>
-      <svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-      </svg>
-    </button>
-  </div>
-  <% } %>
-
+  <%- include("../components/toast") %>
 
   <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">

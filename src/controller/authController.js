@@ -3,60 +3,41 @@ import bcrypt from "bcryptjs";
 import { v7 as uuidv7 } from "uuid";
 import db from "../db.js";
 import tokens from "../utils/tokens.js";
+import registerValidate from "../utils/validatores.js";
 
-const validate = (req) => {
-  let {
-    first_name,
-    second_name,
-    email,
-    password,
-    grade,
-    national_id,
-    phone_number,
-    gender,
-    date_of_birth,
-  } = req.body;
+const handleRefreshTokenAPI = (req, res) => {
+  const cookies = req.cookies;
 
-  if (
-    !first_name ||
-    !second_name ||
-    !email ||
-    !password ||
-    !grade ||
-    !national_id ||
-    !phone_number ||
-    !gender ||
-    !date_of_birth
-  )
-    return "All fields are required";
+  if (!cookies || !cookies.refreshToken) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^\d{11}$/;
-  const nationalIdRegex = /^\d{14}$/;
-  const nameRegex = /^[a-zA-Z]+$/;
+  const refreshToken = cookies.refreshToken;
 
-  if (!emailRegex.test(email)) return "Invalid email format";
-  if (password.length < 8) return "Password must be at least 8 characters";
-  if (
-    first_name < 3 ||
-    second_name < 3 ||
-    !nameRegex.test(first_name) ||
-    !nameRegex.test(second_name)
-  )
-    return "Invalid name";
+  try {
+    const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-  if (!phoneRegex.test(phone_number)) return "Invalid phone number";
-  if (!nationalIdRegex.test(national_id)) return "Invalid national ID";
+    const userdb = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
 
-  if (gender !== "male" && gender !== "female") return "Invalid gender";
+    if (!userdb || userdb.refresh_token !== refreshToken) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
 
-  // date of birth less than 12 years
-  const dob = new Date(date_of_birth);
-  const today = new Date();
-  const age = today.getFullYear() - dob.getFullYear();
-  if (age < 12) return "You must be at least 12 years old";
+    const newAccessToken = tokens.createAccessToken(userdb);
 
-  return "true";
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: false,
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      message: "Access token refreshed successfully!",
+    });
+  } catch (err) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
 };
 
 const handleRefreshToken = (req, res) => {
@@ -102,15 +83,6 @@ const handleRefreshToken = (req, res) => {
 const login = (req, res) => {
   const { email, password, remember_me } = req.body;
   if (!email || !password) {
-    app.get("/login", (req, res) => {
-      // Check if the query parameter exists
-      const isRegistered = req.query.registered === "true";
-
-      res.render("auth/login", {
-        toast: isRegistered,
-        message: isRegistered ? "Registered Successfully" : "",
-      });
-    });
     return res
       .status(400)
       .send({ success: false, message: "All fields are required" });
@@ -167,24 +139,29 @@ const register = (req, res) => {
     date_of_birth,
   } = req.body;
 
-  const valid = validate(req);
-  if (validate(req) != "true") {
-    return res.status(400).send({
+  const result = registerValidate.safeParse(req.body);
+
+  if (!result.success) {
+    let errors = Object.values(result.error.flatten().fieldErrors).flat();
+    return res.status(400).json({
       success: false,
-      message: valid,
+      message: errors,
     });
   }
 
   try {
-    const userId = uuidv7();
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    if (user) {
+      return res
+        .status(400)
+        .send({ success: false, message: "User already exists" });
+    }
     const hashedPassword = bcrypt.hashSync(password, 10);
-
-    // Insert into 'users' table including the date_of_birth column
-    const userQuery = db.prepare(
+    const user_id = uuidv7();
+    db.prepare(
       "INSERT INTO users (id, first_name, second_name, email, password, national_id, phone_number, gender, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    );
-    userQuery.run(
-      userId,
+    ).run(
+      user_id,
       first_name,
       second_name,
       email,
@@ -192,21 +169,19 @@ const register = (req, res) => {
       national_id,
       phone_number,
       gender,
-      date_of_birth, // Pass date_of_birth to the query
+      date_of_birth,
     );
 
-    // Insert into 'students' table mapping user to grade
-    const studentQuery = db.prepare(
-      "INSERT INTO students (user_id, grade_id) VALUES (?, ?)",
+    db.prepare("INSERT INTO students (user_id, grade_id) VALUES (?, ?)").run(
+      user_id,
+      grade,
     );
-    studentQuery.run(userId, grade);
 
-    return res.status(200).send({
-      success: true,
-      message: "Registered Successfully!",
-    });
+    return res
+      .status(201)
+      .send({ success: true, message: "User created successfully" });
   } catch (error) {
-    // ... catch block remains the same ...
+    return res.status(500).send({ success: false, message: [error.message] });
   }
 };
-export default { handleRefreshToken, login, register };
+export default { handleRefreshToken, handleRefreshTokenAPI, login, register };

@@ -1,4 +1,5 @@
 import db from "../db.js";
+import bcrypt from "bcryptjs";
 
 const studentDashboard = (req, res) => {
   let toast = false;
@@ -145,4 +146,50 @@ const studentProfile = (req, res) => {
     });
   }
 };
-export default { studentDashboard, studentProfile };
+
+const changePassword = (req, res) => {
+  let { currPassword, newPassword, confirmPassword } = req.body;
+  if (!currPassword || !newPassword || !confirmPassword) {
+    return res
+      .status(400)
+      .send({ success: false, message: "All fields are required" });
+  }
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Passwords do not match" });
+  }
+
+  try {
+    const hashNewPassword = bcrypt.hashSync(newPassword, 10);
+
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+    if (!user) {
+      return res
+        .status(404)
+        .send({ success: false, message: "User not found" });
+    }
+
+    if (!bcrypt.compareSync(currPassword, user.password)) {
+      return res
+        .status(400)
+        .send({ success: false, message: "Current password is incorrect" });
+    }
+
+    const result = db
+      .prepare("UPDATE users SET password = ? WHERE id = ?")
+      .run(hashNewPassword, user.id);
+
+    return res
+      .status(200)
+      .send({ success: true, message: "Password changed successfully" });
+    
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send({ success: false, message: "Something went wrong" });
+  }
+};
+
+export default { studentDashboard, studentProfile, changePassword };

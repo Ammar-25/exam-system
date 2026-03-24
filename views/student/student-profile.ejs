@@ -70,77 +70,14 @@
 
 <body class="h-full text-white bg-gray-900">
 
-  <!-- NAV (identical to home) -->
-  <nav class="border-b border-white/10 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-20 items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img src="/assets/examImg.png" alt="Exam System Logo" class="h-8 w-auto" onerror="this.style.display='none'" />
-          <span class="text-xl font-bold tracking-tight text-white"><a href="/" class="hover:text-white transition-colors">Exam System</a></span>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <!-- Notification Bell -->
-          <div class="relative" id="notif-wrapper">
-            <button onclick="toggleNotif()" class="cursor-pointer relative text-gray-400 hover:text-white transition-colors focus:outline-none" id="notif-btn">
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-              </svg>
-              <!-- Red badge -->
-              <% if (notifications.length > 0) { %>
-              <span id="notif-badge" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"> <%- notifications.length %> </span>
-              <% } %>
-            </button>
-
-            <!-- Dropdown -->
-            <div id="notif-dropdown" class="hidden absolute right-0 mt-3 w-80 rounded-xl border border-white/10 bg-gray-900 shadow-xl z-50 overflow-hidden">
-              <!-- Header -->
-              <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
-                <span class="text-sm font-semibold text-white">Notifications</span>
-                <button onclick="markAllRead()" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">Mark all as read</button>
-              </div>
-
-              <!-- Notification List -->
-              <ul class="divide-y divide-white/10 max-h-72 overflow-y-auto" id="notif-list">
-                <% if (notifications && notifications.length > 0) { %>
-                <% notifications.forEach(notification => { %>
-                <li class="flex gap-3 px-4 py-3 bg-indigo-500/5 hover:bg-white/5 transition-colors notif-item unread">
-                  <div class="mt-1 flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400 self-start mt-2"></div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-white"><%- notification.message %></p>
-                    <p class="text-xs text-gray-400 mt-0.5 "><%- notification.title %></p>
-                    <!-- <p class="text-xs text-gray-500 mt-1">2 hours ago</p> -->
-                  </div>
-                </li>
-                <% }) %>
-                <% } else { %>
-                <li class="px-4 py-6 text-center text-sm text-gray-500">
-                  You have no notifications.
-                </li>
-                <% } %>
-              </ul>
-
-              <!-- Footer -->
-              <div class="px-4 py-3 border-t border-white/10 text-center">
-                <a href="/notifications" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">View all notifications</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative ml-3">
-            <button onclick="logout()" class="text-sm font-semibold text-red-400 hover:text-red-300 ml-2 transition-colors bg-red-900/40 p-2 rounded-md cursor-pointer">Logout</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <%- include("../components/navbar") %>
 
   <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
     <!-- Page Header -->
     <div class="animate-in delay-1 mb-8">
       <div class="flex items-center gap-2 text-sm text-gray-400 mb-3">
-        <a href="/" class="hover:text-white transition-colors">Dashboard</a>
+        <a href="/student/dashboard" class="hover:text-white transition-colors">Dashboard</a>
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
@@ -166,13 +103,6 @@
               <div class="h-24 w-24 rounded-full bg-indigo-500 flex items-center justify-center text-3xl font-bold text-white ring-4 ring-indigo-500/30 select-none">
                 <%- user.first_name[0] + user.second_name[0]%>
               </div>
-              <!-- <button onclick="document.getElementById('avatar-input').click()" class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </button> -->
-              <!-- <input type="file" id="avatar-input" accept="image/*" class="hidden" /> -->
             </div>
 
             <div>
@@ -402,7 +332,7 @@
             <button onclick="showToast('No changes to discard.')" class="rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Cancel
             </button>
-            <button onclick="handlePasswordChange()" class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-400 active:scale-95 transition-all">
+            <button onclick="handlePasswordChange()" id="password-update-btn" class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-400 active:scale-95 transition-all">
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -474,7 +404,30 @@
     const first_name = document.getElementById('first-name');
     const last_name = document.getElementById('last-name');
     const gender = document.getElementById('gender');
-    const button = document.getElementById('update-btn');
+    const dataUpdateButton = document.getElementById('update-btn');
+    const passwordUpdateButton = document.getElementById('password-update-btn');
+
+    function updatePasswordBtn(updating) {
+      if (updating) {
+        passwordUpdateButton.disabled = true;
+        passwordUpdateButton.classList.add('opacity-70', 'cursor-not-allowed');
+
+        passwordUpdateButton.innerHTML = `
+        <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Updating...
+        `;
+      } else {
+        passwordUpdateButton.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        Update Password`;
+        passwordUpdateButton.disabled = false;
+        passwordUpdateButton.classList.remove('opacity-70', 'cursor-not-allowed');
+      }
+    }
 
 
     async function updateInfo() {
@@ -484,14 +437,14 @@
         gender: gender.value
       };
 
-      button.disabled = true;
-      button.innerHTML = `
+      dataUpdateButton.disabled = true;
+      dataUpdateButton.innerHTML = `
               <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2a8 8 0 00-15.94-2M4 9h4m12 11v-5h-.581m0 0a8 8 0 01-15.357-2m15.357 2H20" />
               </svg>
               Saving...
               `;
-      button.classList.add('opacity-70', 'cursor-not-allowed');
+      dataUpdateButton.classList.add('opacity-70', 'cursor-not-allowed');
 
 
       try {
@@ -512,14 +465,14 @@
         showToast(error.message, true);
       } finally {
         // Re-enable button regardless of success or failure
-        button.disabled = false;
-        button.innerHTML = `
+        dataUpdateButton.disabled = false;
+        dataUpdateButton.innerHTML = `
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
       </svg>
       Save Changes
       `;
-        button.classList.remove('opacity-70', 'cursor-not-allowed');
+        dataUpdateButton.classList.remove('opacity-70', 'cursor-not-allowed');
       }
     }
   </script>
@@ -602,7 +555,6 @@
     let toastTimer;
 
     function showToast(msg, isError = false) {
-      console.log("hello World!");
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toast-msg');
       const toastIcon = document.getElementById('toast-icon');
@@ -621,14 +573,49 @@
       toastTimer = setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
-    function handlePasswordChange() {
+    async function handlePasswordChange() {
+      updatePasswordBtn(true);
       const cur = document.getElementById('current-pw').value;
       const newP = document.getElementById('new-pw').value;
       const conf = document.getElementById('confirm-pw').value;
-      if (!cur || !newP || !conf) return showToast('Please fill in all password fields.', true);
-      if (newP !== conf) return showToast('New passwords do not match.', true);
-      if (newP.length < 8) return showToast('Password must be at least 8 characters.', true);
-      showToast('Password updated successfully!');
+      if (!cur || !newP || !conf) {
+        updatePasswordBtn(false);
+        return showToast('Please fill in all password fields.', true);
+      }
+      if (newP !== conf) {
+        updatePasswordBtn(false);
+        return showToast('New passwords do not match.', true);
+      }
+      if (newP.length < 8) {
+        updatePasswordBtn(false);
+        return showToast('Password must be at least 8 characters.', true);
+      }
+
+      let data = {
+        currPassword: cur,
+        newPassword: newP,
+        confirmPassword: conf
+      }
+
+      const res = await apiFetch("/student/changePassword", {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const resData = await res.json();
+
+      if (res.status === 200) {
+        console.log("Password updated successfully!")
+        document.getElementById('current-pw').value = '';
+        document.getElementById('new-pw').value = '';
+        document.getElementById('confirm-pw').value = '';
+        showToast('Password updated successfully!');
+      } else {
+        showToast(resData.message, true);
+      }
+      updatePasswordBtn(false);
     }
 
     function showDeleteConfirm() {

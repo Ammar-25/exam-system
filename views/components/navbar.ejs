@@ -1,0 +1,69 @@
+  <nav class="border-b border-white/10 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-20 items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="/assets/examImg.png" alt="Exam System Logo" class="h-8 w-auto" />
+          <span class="text-xl font-bold tracking-tight text-white"><a href="/student/dashboard" class="hover:text-white transition-colors">Exam System</a></span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Notification Bell with Dropdown -->
+          <div class="relative" id="notif-wrapper">
+            <button onclick="toggleNotif()" class="flex items-center justify-center cursor-pointer relative text-gray-400 hover:text-white transition-colors focus:outline-none" id="notif-btn">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+              </svg>
+              <!-- Red badge -->
+              <% if (notifications.length > 0) { %>
+              <span id="notif-badge" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"> <%- notifications.length %> </span>
+              <% } %>
+            </button>
+
+            <!-- Dropdown -->
+            <div id="notif-dropdown" class="hidden absolute right-0 mt-3 w-80 rounded-xl border border-white/10 bg-gray-900 shadow-xl z-50 overflow-hidden">
+              <!-- Header -->
+              <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <span class="text-sm font-semibold text-white">Notifications</span>
+                <button onclick="markAllRead()" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer">Mark all as read</button>
+              </div>
+
+              <!-- Notification List -->
+              <ul class="divide-y divide-white/10 max-h-72 overflow-y-auto" id="notif-list">
+                <% if (notifications && notifications.length > 0) { %>
+                <% notifications.forEach(notification => { %>
+                <li class="flex gap-3 px-4 py-3 bg-indigo-500/5 hover:bg-white/5 transition-colors notif-item unread">
+                  <div class="mt-1 flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400 self-start mt-2"></div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white"><%- notification.message %></p>
+                    <p class="text-xs text-gray-400 mt-0.5 "><%- notification.title %></p>
+                    <!-- <p class="text-xs text-gray-500 mt-1">2 hours ago</p> -->
+                  </div>
+                </li>
+                <% }) %>
+                <% } else { %>
+                <li class="px-4 py-6 text-center text-sm text-gray-500">
+                  You have no notifications.
+                </li>
+                <% } %>
+              </ul>
+
+              <!-- Footer -->
+              <div class="px-4 py-3 border-t border-white/10 text-center">
+                <a href="/notifications" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">View all notifications</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative ml-3">
+            <div class="flex items-center gap-3">
+              <!-- <span class="text-sm font-medium text-gray-300 hidden sm:block">Welcome, <%= typeof user !== 'undefined' ? user.first_name : 'Student' %></span>
+              <button type="button" class="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button">
+                <img class="h-8 w-8 rounded-full border border-gray-600" src="https://ui-avatars.com/api/?name=Student&background=6366f1&color=fff" alt="User Avatar" />
+              </button> -->
+              <button onclick="logout()" class="text-sm font-semibold text-red-400 hover:text-red-300 transition-colors bg-red-900/40 p-2 rounded-md cursor-pointer">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>

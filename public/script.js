@@ -1,15 +1,18 @@
 async function apiFetch(url, options = {}) {
-  let response = await fetch(url, options);
+  const fetchOptions = { ...options, credentials: "include" };
+
+  let response = await fetch(url, fetchOptions);
 
   if (response.status === 401) {
     console.log("Token expired, attempting refresh...");
 
     const refreshRes = await fetch("/refresh", {
-      method: "POST",
+      method: "GET",
+      credentials: "include",
     });
 
     if (refreshRes.status === 200) {
-      response = await fetch(url, options);
+      response = await fetch(url, fetchOptions);
     } else {
       window.location.href = "/login";
       throw new Error("Token refresh failed");

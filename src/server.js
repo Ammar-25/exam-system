@@ -5,7 +5,6 @@ import authRoutes from "./routes/AuthRoutes.js";
 import cookieParser from "cookie-parser";
 import db from "./db.js";
 import authController from "../src/controller/authController.js";
-import verifyAuth from "./middleware/authMiddleware.js";
 import studentController from "../src/controller/studentController.js";
 import studentRouter from "./routes/studentRoutes.js";
 
@@ -24,9 +23,10 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-app.use("/student", verifyAuth, studentRouter);
+app.use("/student", studentRouter);
 
 app.get("/refresh/token", authController.handleRefreshToken);
+app.get("/refresh", authController.handleRefreshTokenAPI);
 
 app.use("/", authRoutes);
 
