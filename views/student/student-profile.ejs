@@ -385,7 +385,7 @@
         <button onclick="closeDeleteConfirm()" class="flex-1 rounded-lg border border-white/10 bg-white/5 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors cursor-pointer">
           Cancel
         </button>
-        <button onclick="closeDeleteConfirm(); showToast('Account deletion requested.', true)" class="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition-colors cursor-pointer">
+        <button onclick="closeDeleteConfirm();" id="delete-profile-btn" class="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition-colors cursor-pointer">
           Yes, Delete
         </button>
       </div>
@@ -615,9 +615,31 @@
       document.getElementById('delete-modal').classList.add('flex');
     }
 
-    function closeDeleteConfirm() {
-      document.getElementById('delete-modal').classList.add('hidden');
-      document.getElementById('delete-modal').classList.remove('flex');
+    async function closeDeleteConfirm() {
+      const button = document.getElementById('delete-profile-btn');
+      button.disabled = true;
+      button.classList.add('opacity-70', 'cursor-not-allowed');
+
+      try {
+        const res = await apiFetch('/student/delete', {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          window.location.href = '/login?toast=true&type=success&message=Account%20deleted%20successfully';
+        } else {
+          const resData = await res.json();
+          console.log(resData.message);
+          document.getElementById('delete-modal').classList.add('hidden');
+          document.getElementById('delete-modal').classList.remove('flex');
+          showToast('Something went wrong.', true);
+        }
+      } catch (error) {
+        document.getElementById('delete-modal').classList.add('hidden');
+        document.getElementById('delete-modal').classList.remove('flex');
+        console.log(error);
+        showToast("Something went wrong.", true);
+      }
+
     }
   </script>
 
