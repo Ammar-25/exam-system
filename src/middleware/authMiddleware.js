@@ -1,6 +1,4 @@
 import jwt from "jsonwebtoken";
-import db from "../db.js";
-import tokens from "../utils/tokens.js";
 
 const verifyAuth = (req, res, next) => {
   const accessToken = req.cookies.accessToken;
@@ -23,4 +21,20 @@ const verifyAuth = (req, res, next) => {
   }
 };
 
-export default verifyAuth;
+const verifyAPIAuth = (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  try {
+    const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    req.user = decoded.id;
+    next();
+  } catch (err) {
+    res.clearCookie("accessToken");
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+};
+
+export { verifyAuth, verifyAPIAuth };

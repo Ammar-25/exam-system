@@ -3,6 +3,42 @@ import bcrypt from "bcryptjs";
 import { v7 as uuidv7 } from "uuid";
 import db from "../db.js";
 import tokens from "../utils/tokens.js";
+import registerValidate from "../utils/validatores.js";
+
+const handleRefreshTokenAPI = (req, res) => {
+  const cookies = req.cookies;
+
+  if (!cookies || !cookies.refreshToken) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const refreshToken = cookies.refreshToken;
+
+  try {
+    const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const userdb = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
+
+    if (!userdb || userdb.refresh_token !== refreshToken) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const newAccessToken = tokens.createAccessToken(userdb);
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: false,
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      message: "Access token refreshed successfully!",
+    });
+  } catch (err) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+};
 
 const handleRefreshToken = (req, res) => {
   const cookies = req.cookies;
@@ -47,15 +83,6 @@ const handleRefreshToken = (req, res) => {
 const login = (req, res) => {
   const { email, password, remember_me } = req.body;
   if (!email || !password) {
-    app.get("/login", (req, res) => {
-      // Check if the query parameter exists
-      const isRegistered = req.query.registered === "true";
-
-      res.render("login", {
-        toast: isRegistered,
-        message: isRegistered ? "Registered Successfully" : "",
-      });
-    });
     return res
       .status(400)
       .send({ success: false, message: "All fields are required" });
@@ -91,45 +118,70 @@ const login = (req, res) => {
       maxAge: 15 * 60 * 1000,
     });
 
-    return res.status(200).send({ success: true, message: "Login successful" });
+    return res
+      .status(200)
+      .send({ success: true, message: "Login successful", type: user.type });
   } catch (err) {
     return res.status(500).send({ success: false, message: err.message });
   }
 };
 
 const register = (req, res) => {
-  let { first_name, second_name, email, password, grade } = req.body;
-  if (!first_name || !second_name || !email || !password || !grade) {
-    return res.status(400).send({
+  let {
+    first_name,
+    second_name,
+    email,
+    password,
+    grade,
+    national_id,
+    phone_number,
+    gender,
+    date_of_birth,
+  } = req.body;
+
+  const result = registerValidate.safeParse(req.body);
+
+  if (!result.success) {
+    let errors = Object.values(result.error.flatten().fieldErrors).flat();
+    return res.status(400).json({
       success: false,
-      message: "All fields are required",
+      message: errors,
     });
   }
+
   try {
-    const userId = uuidv7();
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    if (user) {
+      return res
+        .status(400)
+        .send({ success: false, message: "User already exists" });
+    }
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const userQuery = db.prepare(
-      "INSERT INTO users (id, first_name, second_name, email, password) VALUES (?, ?, ?, ?, ?)",
-    );
-    const user = userQuery.run(
-      userId,
+    const user_id = uuidv7();
+    db.prepare(
+      "INSERT INTO users (id, first_name, second_name, email, password, national_id, phone_number, gender, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    ).run(
+      user_id,
       first_name,
       second_name,
       email,
       hashedPassword,
+      national_id,
+      phone_number,
+      gender,
+      date_of_birth,
     );
-    const student = db.prepare(
-      "INSERT INTO students (user_id, grade_id) VALUES (?, ?)",
+
+    db.prepare("INSERT INTO students (user_id, grade_id) VALUES (?, ?)").run(
+      user_id,
+      grade,
     );
-    student.run(userId, grade);
+
     return res
-      .status(200)
-      .send({ success: true, message: "Registerd Successfully!" });
+      .status(201)
+      .send({ success: true, message: "User created successfully" });
   } catch (error) {
-    return res
-      .status(500)
-      .send({ success: false, message: "User with this email already exists" });
+    return res.status(500).send({ success: false, message: [error.message] });
   }
 };
-
-export default { handleRefreshToken, login, register };
+export default { handleRefreshToken, handleRefreshTokenAPI, login, register };

@@ -8,7 +8,6 @@ const seed = () => {
 
   try {
     // --- 0. WIPE EXISTING DATA & RESET COUNTERS ---
-    // This allows you to run this script safely as many times as you want
     db.exec(`
       PRAGMA foreign_keys = OFF;
       DELETE FROM notifications;
@@ -47,9 +46,11 @@ const seed = () => {
     insertSubject.run(3, "Grade 12 Literature"); // id: 6
 
     // --- 3. USERS ---
+    // Added national_id, phone_number, gender, and dob to satisfy NOT NULL constraints
     const insertUser = db.prepare(
-      "INSERT INTO users (id, first_name, second_name, email, password, type) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO users (id, first_name, second_name, email, password, type, national_id, phone_number, gender, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     );
+
     // Students
     insertUser.run(
       "s1",
@@ -58,9 +59,35 @@ const seed = () => {
       "ammar@gmail.com",
       pass,
       "student",
+      "10000000000001",
+      "01000000001",
+      "male",
+      "2010-05-14", // Approx 15/16 for Grade 10
     );
-    insertUser.run("s2", "Sara", "Ahmed", "sara@gmail.com", pass, "student");
-    insertUser.run("s3", "Omar", "Hassan", "omar@gmail.com", pass, "student");
+    insertUser.run(
+      "s2",
+      "Sara",
+      "Ahmed",
+      "sara@gmail.com",
+      pass,
+      "student",
+      "10000000000002",
+      "01000000002",
+      "female",
+      "2009-11-20", // Approx 16/17 for Grade 11
+    );
+    insertUser.run(
+      "s3",
+      "Omar",
+      "Hassan",
+      "omar@gmail.com",
+      pass,
+      "student",
+      "10000000000003",
+      "01000000003",
+      "male",
+      "2010-02-28", // Approx 15/16 for Grade 10
+    );
     insertUser.run(
       "s4",
       "Laila",
@@ -68,12 +95,49 @@ const seed = () => {
       "laila@gmail.com",
       pass,
       "student",
+      "10000000000004",
+      "01000000004",
+      "female",
+      "2008-08-15", // Approx 17/18 for Grade 12
     );
-    insertUser.run("s5", "Ziad", "Tariq", "ziad@gmail.com", pass, "student");
+    insertUser.run(
+      "s5",
+      "Ziad",
+      "Tariq",
+      "ziad@gmail.com",
+      pass,
+      "student",
+      "10000000000005",
+      "01000000005",
+      "male",
+      "2009-04-10", // Approx 16/17 for Grade 11
+    );
 
     // Teachers
-    insertUser.run("t1", "John", "Smith", "john@school.com", pass, "teacher");
-    insertUser.run("t2", "Emma", "Johnson", "emma@school.com", pass, "teacher");
+    insertUser.run(
+      "t1",
+      "John",
+      "Smith",
+      "john@school.com",
+      pass,
+      "teacher",
+      "20000000000001",
+      "01100000001",
+      "male",
+      "1985-06-20",
+    );
+    insertUser.run(
+      "t2",
+      "Emma",
+      "Johnson",
+      "emma@school.com",
+      pass,
+      "teacher",
+      "20000000000002",
+      "01100000002",
+      "female",
+      "1990-09-12",
+    );
     insertUser.run(
       "t3",
       "Michael",
@@ -81,6 +145,10 @@ const seed = () => {
       "michael@school.com",
       pass,
       "teacher",
+      "20000000000003",
+      "01100000003",
+      "male",
+      "1982-01-30",
     );
     insertUser.run(
       "t4",
@@ -89,6 +157,10 @@ const seed = () => {
       "sophia@school.com",
       pass,
       "teacher",
+      "20000000000004",
+      "01100000004",
+      "female",
+      "1992-12-05",
     );
 
     // --- 4. STUDENTS ---
@@ -141,87 +213,74 @@ const seed = () => {
     const insertOption = db.prepare(
       "INSERT INTO options (question_id, option_text, is_correct, marks) VALUES (?, ?, ?, ?)",
     );
-    // Q1 Options (Math: 5*5)
+    // Q1 Options
     insertOption.run(1, "10", 0, 0);
     insertOption.run(1, "20", 0, 0);
-    insertOption.run(1, "25", 1, 5); // Correct (id: 3)
+    insertOption.run(1, "25", 1, 5); // Correct
     insertOption.run(1, "30", 0, 0);
 
-    // Q2 Options (Math: 2x=10)
-    insertOption.run(2, "x = 5", 1, 5); // Correct (id: 5)
+    // Q2 Options
+    insertOption.run(2, "x = 5", 1, 5); // Correct
     insertOption.run(2, "x = 8", 0, 0);
     insertOption.run(2, "x = 12", 0, 0);
 
-    // Q3 Options (Physics: Unit of Force)
+    // Q3 Options
     insertOption.run(3, "Joule", 0, 0);
-    insertOption.run(3, "Newton", 1, 5); // Correct (id: 9)
+    insertOption.run(3, "Newton", 1, 5); // Correct
     insertOption.run(3, "Watt", 0, 0);
 
-    // Q4 Options (Physics: Gravity T/F)
-    insertOption.run(4, "True", 1, 5); // Correct (id: 11)
+    // Q4 Options
+    insertOption.run(4, "True", 1, 5); // Correct
     insertOption.run(4, "False", 0, 0);
 
-    // Q5 Options (Comp Sci: Boolean)
+    // Q5 Options
     insertOption.run(5, "String", 0, 0);
-    insertOption.run(5, "True", 1, 10); // Correct (id: 14)
+    insertOption.run(5, "True", 1, 10); // Correct
     insertOption.run(5, "Integer", 0, 0);
 
     // --- 9. EXAM SESSIONS ---
     const insertSession = db.prepare(
       "INSERT INTO exam_sessions (exam_id, student_id, start_time, end_time, score) VALUES (?, ?, ?, ?, ?)",
     );
-    // Ammar (s1) takes Math and Physics
     insertSession.run(
       1,
       "s1",
       "2026-04-15 10:00:00",
       "2026-04-15 10:45:00",
       10,
-    ); // Session id: 1
+    ); // id: 1
     insertSession.run(
       2,
       "s1",
       "2026-04-20 12:00:00",
       "2026-04-20 12:20:00",
       10,
-    ); // Session id: 2
-
-    // Omar (s3) takes Math
-    insertSession.run(1, "s3", "2026-04-15 10:05:00", "2026-04-15 11:00:00", 5); // Session id: 3
-
-    // Laila (s4) takes Comp Sci
+    ); // id: 2
+    insertSession.run(1, "s3", "2026-04-15 10:05:00", "2026-04-15 11:00:00", 5); // id: 3
     insertSession.run(
       3,
       "s4",
       "2026-05-10 09:00:00",
       "2026-05-10 10:30:00",
       10,
-    ); // Session id: 4
+    ); // id: 4
 
     // --- 10. EXAM SESSION ANSWERS ---
     const insertAnswer = db.prepare(
       "INSERT INTO exam_session_answers (exam_session_id, question_id, option_id) VALUES (?, ?, ?)",
     );
-    // Session 1: Ammar's Math Answers (100%)
-    insertAnswer.run(1, 1, 3); // Picked 25
-    insertAnswer.run(1, 2, 5); // Picked x = 5
-
-    // Session 2: Ammar's Physics Answers (100%)
-    insertAnswer.run(2, 3, 9); // Picked Newton
-    insertAnswer.run(2, 4, 11); // Picked True
-
-    // Session 3: Omar's Math Answers (50%)
-    insertAnswer.run(3, 1, 3); // Picked 25 (Correct)
-    insertAnswer.run(3, 2, 6); // Picked x = 8 (Incorrect)
-
-    // Session 4: Laila's Comp Sci Answers (100%)
-    insertAnswer.run(4, 5, 14); // Picked True
+    insertAnswer.run(1, 1, 3);
+    insertAnswer.run(1, 2, 5);
+    insertAnswer.run(2, 3, 9);
+    insertAnswer.run(2, 4, 11);
+    insertAnswer.run(3, 1, 3);
+    insertAnswer.run(3, 2, 6);
+    insertAnswer.run(4, 5, 14);
 
     // --- 11. NOTIFICATIONS ---
     const insertNotification = db.prepare(
-      "INSERT INTO notifications (user_id, message, title, read) VALUES (?, ?, ?, ?)",
+      "INSERT INTO notifications (user_id, title, message, read) VALUES (?, ?, ?, ?)",
     );
-    // 0 = false (unread), 1 = true (read)
     insertNotification.run(
       "s1",
       "Score Update",
@@ -251,10 +310,10 @@ const seed = () => {
       "Student Update",
       "Student Omar Hassan has submitted the Math Midterm.",
       0,
-    ); // Teacher notification
+    );
 
     console.log(
-      "✅ Expanded database (with notifications) seeded successfully!",
+      "✅ Expanded database (with DOBs and notifications) seeded successfully!",
     );
   } catch (err) {
     console.error("❌ Error seeding database:", err.message);

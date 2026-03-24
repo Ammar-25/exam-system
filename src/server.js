@@ -5,8 +5,8 @@ import authRoutes from "./routes/AuthRoutes.js";
 import cookieParser from "cookie-parser";
 import db from "./db.js";
 import authController from "../src/controller/authController.js";
-import verifyAuth from "./middleware/authMiddleware.js";
 import studentController from "../src/controller/studentController.js";
+import studentRouter from "./routes/studentRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,23 +19,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.get("/", verifyAuth, (req, res) => {
-  try {
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
-    if (user.type === "student") {
-      studentController.studentHome(req, res, user);
-    } else {
-      res.render("teacher-home.ejs", { user: user });
-    }
-  } catch (error) {
-    return res.render("/login", {
-      toast: true,
-      message: "Something went wrong",
-    });
-  }
+app.get("/", (req, res) => {
+  res.render("index");
 });
 
+app.use("/student", studentRouter);
+
 app.get("/refresh/token", authController.handleRefreshToken);
+app.get("/refresh", authController.handleRefreshTokenAPI);
 
 app.use("/", authRoutes);
 
