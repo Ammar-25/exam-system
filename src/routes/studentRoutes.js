@@ -30,4 +30,6 @@ studentRouter.post(
 
 studentRouter.delete("/delete", verifyAPIAuth, studentController.deleteStudent);
 
+studentRouter.get("/subjects", verifyAuth, studentController.subjectsView);
+
 export default studentRouter;

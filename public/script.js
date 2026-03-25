@@ -89,6 +89,8 @@ async function markAllRead() {
   const badge = document.getElementById("notif-badge");
   const container = document.getElementById("notif-list");
 
+  loadingMarkAsRead(true);
+
   try {
     const res = await apiFetch("/student/mark-all-read", {
       method: "POST",
@@ -111,11 +113,15 @@ async function markAllRead() {
   } catch (error) {
     console.error(error);
     showToast("Network error occurred", true);
+  } finally {
+    loadingMarkAsRead(false);
+    button.disabled = false;
   }
-  button.disabled = false;
 }
 
 async function markOneRead(id) {
+  loadingMarkAsRead();
+
   try {
     const res = await apiFetch(`/student/mark-one-read/${id}`, {
       method: "POST",
@@ -158,6 +164,8 @@ async function markOneRead(id) {
   } catch (error) {
     console.error(error);
     showToast("Network error occurred", true);
+  } finally {
+    loadingMarkAsRead(false);
   }
 }
 
@@ -183,4 +191,23 @@ function showToast(msg, isError = false) {
   toast.classList.remove("hidden");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.add("hidden"), 3000);
+}
+
+function loadingMarkAsRead(loading = true) {
+  const overlay = document.getElementById("notif-loading-overlay");
+  const list = document.getElementById("notif-list");
+
+  if (!overlay || !list) return;
+
+  if (loading) {
+    overlay.classList.remove("opacity-0", "pointer-events-none");
+    overlay.classList.add("opacity-100", "pointer-events-auto");
+
+    list.classList.add("pointer-events-none", "animate-pulse");
+  } else {
+    overlay.classList.remove("opacity-100", "pointer-events-auto");
+    overlay.classList.add("opacity-0", "pointer-events-none");
+
+    list.classList.remove("pointer-events-none", "animate-pulse");
+  }
 }
