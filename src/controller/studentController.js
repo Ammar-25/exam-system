@@ -238,7 +238,6 @@ const deleteStudent = (req, res) => {
     const studentId = req.user;
     db.prepare("DELETE FROM users WHERE id = ?").run(studentId);
 
-
     res.clearCookie("refreshToken", { path: "/refresh" });
     res.clearCookie("accessToken");
 
@@ -251,6 +250,41 @@ const deleteStudent = (req, res) => {
   }
 };
 
+const subjectsView = (req, res) => {
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+    const student = db
+      .prepare("SELECT * FROM students WHERE user_id = ?")
+      .get(req.user);
+    const subjects = db
+      .prepare(
+        `
+        SELECT subjects.id as id, subjects.name as name, count(DISTINCT exams.id) as totalExams, count(DISTINCT exam_sessions.exam_id) as completedExams
+FROM users
+JOIN students on students.user_id = users.id
+JOIN subjects on students.grade_id = subjects.grade_id
+LEFT JOIN exams on exams.subject_id = subjects.id
+LEFT JOIN exam_sessions on exam_sessions.exam_id = exams.id and exam_sessions.student_id = ?
+WHERE users.id = ?
+GROUP BY subjects.id
+ORDER BY subjects.name ASC
+      `,
+      )
+      .all(req.user, req.user);
+    const notifications = db
+      .prepare("SELECT * FROM notifications where user_id = ? AND read = 0")
+      .all(req.user);
+    res.render("student/student-subjects", {
+      user: user,
+      subjects: subjects,
+      notifications: notifications,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.redirec("/");
+  }
+};
+
 export default {
   studentDashboard,
   studentProfile,
@@ -259,4 +293,5 @@ export default {
   markAsRead,
   markAllAsRead,
   deleteStudent,
+  subjectsView,
 };

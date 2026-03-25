@@ -120,7 +120,7 @@ async function markAllRead() {
 }
 
 async function markOneRead(id) {
-  loadingMarkAsRead(false);
+  loadingMarkAsRead();
 
   try {
     const res = await apiFetch(`/student/mark-one-read/${id}`, {

@@ -38,12 +38,14 @@ const seed = () => {
     const insertSubject = db.prepare(
       "INSERT INTO subjects (grade_id, name) VALUES (?, ?)",
     );
-    insertSubject.run(1, "Grade 10 Mathematics"); // id: 1
-    insertSubject.run(1, "Grade 10 Physics"); // id: 2
-    insertSubject.run(2, "Grade 11 Chemistry"); // id: 3
-    insertSubject.run(2, "Grade 11 Biology"); // id: 4
-    insertSubject.run(3, "Grade 12 Computer Science"); // id: 5
-    insertSubject.run(3, "Grade 12 Literature"); // id: 6
+    insertSubject.run(1, "Mathematics");
+    insertSubject.run(1, "Physics");
+    insertSubject.run(1, "Arabic");
+    insertSubject.run(1, "Chemistry");
+    insertSubject.run(2, "Grade 11 Chemistry");
+    insertSubject.run(2, "Grade 11 Biology");
+    insertSubject.run(3, "Grade 12 Computer Science");
+    insertSubject.run(3, "Grade 12 Literature");
 
     // --- 3. USERS ---
     // Added national_id, phone_number, gender, and dob to satisfy NOT NULL constraints
