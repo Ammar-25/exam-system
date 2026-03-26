@@ -32,4 +32,6 @@ studentRouter.delete("/delete", verifyAPIAuth, studentController.deleteStudent);
 
 studentRouter.get("/subjects", verifyAuth, studentController.subjectsView);
 
+studentRouter.get("/exams-history", verifyAuth, studentController.examsHistory);
+
 export default studentRouter;

@@ -285,6 +285,25 @@ ORDER BY subjects.name ASC
   }
 };
 
+const examsHistory = (req, res) => {
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.user);
+  const notifications = db
+    .prepare("SELECT * FROM notifications WHERE user_id = ? AND read = 0")
+    .all(req.user);
+
+  const exams = db.prepare(`
+    SELECT exams.id, exams.title, exams.passing_score, subjects.name as subjectName
+    FROM exams
+    JOIN subjects ON exams.subject_id = subjects.id;`
+  ).all();
+
+  return res.render("student/student-exams-history", {
+    user: user,
+    notifications: notifications,
+    exams: exams,
+  });
+};
+
 export default {
   studentDashboard,
   studentProfile,
@@ -294,4 +313,5 @@ export default {
   markAllAsRead,
   deleteStudent,
   subjectsView,
+  examsHistory,
 };
