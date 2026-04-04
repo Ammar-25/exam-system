@@ -3,9 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/AuthRoutes.js";
 import cookieParser from "cookie-parser";
-import db from "./db.js";
 import authController from "../src/controller/authController.js";
-import studentController from "../src/controller/studentController.js";
 import studentRouter from "./routes/studentRoutes.js";
 
 const app = express();

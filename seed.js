@@ -186,11 +186,18 @@ const seed = () => {
 
     // --- 6. EXAMS ---
     const insertExam = db.prepare(
-      "INSERT INTO exams (subject_id, title, duration, passing_score, date) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO exams (subject_id, title, duration, passing_score, date, total_marks) VALUES (?, ?, ?, ?, ?, ?)",
     );
-    insertExam.run(1, "Math Midterm", 60, 50, "2026-04-15 10:00:00"); // id: 1 (G10 Math)
-    insertExam.run(2, "Physics Quiz 1", 30, 10, "2026-04-20 12:00:00"); // id: 2 (G10 Physics)
-    insertExam.run(5, "Intro to Algorithms", 90, 60, "2026-05-10 09:00:00"); // id: 3 (G12 CS)
+    insertExam.run(1, "Math Midterm", 60, 50, "2026-04-15 10:00:00", 100); // id: 1 (G10 Math)
+    insertExam.run(2, "Physics Quiz 1", 30, 10, "2026-04-20 12:00:00", 20); // id: 2 (G10 Physics)
+    insertExam.run(
+      5,
+      "Intro to Algorithms",
+      90,
+      60,
+      "2026-05-10 09:00:00",
+      100,
+    ); // id: 3 (G12 CS)
 
     // --- 7. QUESTIONS ---
     const insertQuestion = db.prepare(

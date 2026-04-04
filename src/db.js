@@ -67,6 +67,7 @@ db.exec(`
             title TEXT NOT NULL,
             duration INTEGER NOT NULL,
             passing_score INTEGER NOT NULL,
+            total_marks INTEGER NOT NULL,
             date DATETIME NOT NULL,
             FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
         )
