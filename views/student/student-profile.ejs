@@ -118,7 +118,7 @@
           </div>
 
           <!-- Quick stats -->
-          <div class="relative mt-6 grid grid-cols-3 divide-x divide-white/10 rounded-xl bg-white/5 overflow-hidden">
+          <div class="relative mt-6 grid grid-cols-2 divide-x divide-white/10 rounded-xl bg-white/5 overflow-hidden">
             <div class="flex flex-col items-center py-3 px-2">
               <span class="text-lg font-bold text-white"><%- subjects_count %></span>
               <span class="text-[10px] text-gray-400 mt-0.5 text-center leading-tight">Subjects</span>
@@ -126,14 +126,6 @@
             <div class="flex flex-col items-center py-3 px-2">
               <span class="text-lg font-bold text-white"><%- exams %></span>
               <span class="text-[10px] text-gray-400 mt-0.5 text-center leading-tight">Exams</span>
-            </div>
-            <div class="flex flex-col items-center py-3 px-2">
-              <% if (averagePercentage >= 50) { %>
-              <span class="text-lg font-bold text-emerald-400"><%- (typeof averagePercentage === 'number' ? averagePercentage.toFixed(2) : 0)%> %</span>
-              <% } else { %>
-              <span class="text-lg font-bold text-red-400"><%- (typeof averagePercentage === 'number' ? averagePercentage.toFixed(2) : 0) %> %</span>
-              <% } %>
-              <span class=" text-[10px] text-gray-400 mt-0.5 text-center leading-tight">Avg Score</span>
             </div>
           </div>
         </div>

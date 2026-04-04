@@ -46,9 +46,9 @@
 
       <% if (exams && exams.length > 0) { %>
       <%
-        const passed    = exams.filter(e => e.score >= e.passingScore).length;
-        const failed    = exams.filter(e => e.score < e.passingScore).length;
-        const avgScore  = Math.round(exams.reduce((s, e) => s + e.score, 0) / exams.length);
+        const passed    = exams.filter(e => e.result).length;
+        const failed    = exams.filter(e => !e.result).length;
+        const avgScore  = exams.reduce((a, b) => a + (b.score / b.total_marks)*100, 0) / exams.length;
       %>
       <div class="flex flex-wrap gap-3">
         <div class="min-w-[120px] rounded-xl border border-white/10 bg-white/5 p-4 text-center backdrop-blur-sm">
@@ -64,7 +64,7 @@
           <p class="mt-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Failed</p>
         </div>
         <div class="min-w-[120px] rounded-xl border border-white/10 bg-white/5 p-4 text-center backdrop-blur-sm">
-          <p class="text-2xl font-bold leading-none text-indigo-400"><%= avgScore %>%</p>
+          <p class="text-2xl font-bold leading-none <%- (avgScore >= 50 ? 'text-emerald-400' : 'text-rose-400') %>"><%= avgScore %>%</p>
           <p class="mt-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Avg Score</p>
         </div>
       </div>
@@ -103,7 +103,7 @@
         <div class="relative">
           <select id="subject-filter" class="appearance-none cursor-pointer rounded-lg border border-white/10 bg-gray-800/50 py-2.5 pl-4 pr-10 text-sm text-gray-300 outline-none transition-colors focus:border-indigo-500 focus:bg-gray-800 focus:ring-1 focus:ring-indigo-500">
             <option value="all">All Subjects</option>
-            <% const uniqueSubjects = [...new Set(exams.map(e => e.subjectName))]; %>
+            <% const uniqueSubjects = [...new Set(exams.map(e => e.subject))]; %>
             <% uniqueSubjects.forEach(function(sub) { %>
             <option value="<%= sub.toLowerCase() %>"><%= sub %></option>
             <% }); %>
@@ -154,15 +154,17 @@
           <div class="rounded-2xl border border-white/10 bg-white/5 overflow-hidden" id="list-rows">
             <% exams.forEach(function(exam) { %>
             <%
-              const passed      = exam.score >= exam.passingScore;
-              const pct         = exam.score;
+              const passed      = exam.result;
+              const score       = exam.score;
+              const totalMarks  = exam.total_marks;
+              const pct         = exam.total_marks ? Math.round(score / totalMarks * 100) : 0;
               const circ        = 2 * Math.PI * 14;
               const offset      = circ - (pct / 100) * circ;
-              const scoreColor  = pct >= 85 ? '#10b981' : pct >= 60 ? '#6366f1' : '#f43f5e';
+              const scoreColor  = pct >= 50 ? '#10b981' : '#f43f5e';
               const grade       = pct >= 90 ? 'A+' : pct >= 85 ? 'A' : pct >= 80 ? 'B+' : pct >= 75 ? 'B' : pct >= 70 ? 'C+' : pct >= 60 ? 'C' : pct >= 50 ? 'D' : 'F';
-              const dateStr     = new Date(exam.takenAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+              const dateStr     = new Date(exam.date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
             %>
-            <a href="/exams/<%= exam.id %>/result" class="exam-card group relative grid grid-cols-[1fr_160px_110px_130px_100px_12px] items-center gap-0 border-b border-white/10 last:border-0 px-5 py-4 transition-colors hover:bg-white/10" data-name="<%= exam.title.toLowerCase() %>" data-subject="<%= exam.subjectName.toLowerCase() %>" data-result="<%= passed ? 'passed' : 'failed' %>">
+            <a href="/exams/<%= exam.id %>/result" class="exam-card group relative grid grid-cols-[1fr_160px_110px_130px_100px_12px] items-center gap-0 border-b border-white/10 last:border-0 px-5 py-4 transition-colors hover:bg-white/10" data-name="<%= exam.title.toLowerCase() %>" data-subject="<%= exam.subject.toLowerCase() %>" data-result="<%= passed ? 'passed' : 'failed' %>">
 
               <!-- Hover accent -->
               <div class="absolute bottom-0 left-0 top-0 w-1 opacity-0 transition-opacity group-hover:opacity-100" style="background-color: <%= scoreColor %>;"></div>
@@ -170,7 +172,7 @@
               <!-- Name + subject -->
               <div>
                 <p class="text-[15px] font-semibold text-white leading-snug"><%= exam.title %></p>
-                <p class="mt-0.5 text-xs text-gray-500"><%= exam.subjectName %></p>
+                <p class="mt-0.5 text-xs text-gray-500"><%= exam.subject %></p>
               </div>
 
               <!-- Date -->
@@ -199,12 +201,15 @@
               </div>
 
               <!-- Score ring -->
-              <div class="relative flex items-center justify-center">
-                <svg width="70" height="70" viewBox="0 0 36 36" class="-rotate-90">
-                  <circle cx="18" cy="18" r="14" fill="none" class="stroke-white/10" stroke-width="3" />
-                  <circle cx="18" cy="18" r="14" fill="none" stroke-width="3" stroke="<%= scoreColor %>" stroke-dasharray="<%= circ %>" stroke-dashoffset="<%= offset %>" stroke-linecap="round" class="transition-all duration-700 ease-out" />
-                </svg>
-                <span class="absolute font-mono text-xs font-bold text-white" style="top: 28px;"><%= pct %>%</span>
+              <div class="flex flex-col items-center justify-center">
+                <div class="relative flex items-center justify-center">
+                  <svg width="70" height="70" viewBox="0 0 36 36" class="-rotate-90">
+                    <circle cx="18" cy="18" r="14" fill="none" class="stroke-white/10" stroke-width="3" />
+                    <circle cx="18" cy="18" r="14" fill="none" stroke-width="3" stroke="<%= scoreColor %>" stroke-dasharray="<%= circ %>" stroke-dashoffset="<%= offset %>" stroke-linecap="round" class="transition-all duration-700 ease-out" />
+                  </svg>
+                  <span class="absolute font-mono text-xs font-bold text-white"><%= pct %>%</span>
+                </div>
+                <span class="mt-1 text-[11px] font-medium text-gray-400"><%= score %> / <%= totalMarks %></span>
               </div>
 
               <!-- Grade badge -->
@@ -232,13 +237,13 @@
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" id="grid-cards">
         <% exams.forEach(function(exam) { %>
         <%
-          const passed2     = exam.score >= exam.passingScore;
-          const pct2        = exam.score;
-          const scoreColor2 = pct2 >= 85 ? '#10b981' : pct2 >= 60 ? '#6366f1' : '#f43f5e';
+          const passed2     = exam.result;
+          const pct2        = exam.score/exam.total_marks * 100;
+          const scoreColor2 = pct2 >= 50 ? '#10b981' :'#f43f5e';
           const grade2      = pct2 >= 90 ? 'A+' : pct2 >= 85 ? 'A' : pct2 >= 80 ? 'B+' : pct2 >= 75 ? 'B' : pct2 >= 70 ? 'C+' : pct2 >= 60 ? 'C' : pct2 >= 50 ? 'D' : 'F';
-          const dateStr2    = new Date(exam.takenAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+          const dateStr2    = new Date(exam.date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
         %>
-        <a href="/exams/<%= exam.id %>/result" class="exam-card group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:border-indigo-500/50 hover:bg-white/10" data-name="<%= exam.title.toLowerCase() %>" data-subject="<%= exam.subjectName.toLowerCase() %>" data-result="<%= passed2 ? 'passed' : 'failed' %>" style="border-top: 3px solid <%= scoreColor2 %>;">
+        <a href="/exams/<%= exam.id %>/result" class="exam-card group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:border-indigo-500/50 hover:bg-white/10" data-name="<%= exam.title.toLowerCase() %>" data-subject="<%= exam.subject.toLowerCase() %>" data-result="<%= passed2 ? 'passed' : 'failed' %>" style="border-top: 3px solid <%= scoreColor2 %>;">
 
           <!-- Top row: result badge + grade -->
           <div class="mb-4 flex items-center justify-between">
@@ -256,7 +261,7 @@
           <h3 class="mb-0.5 text-lg font-bold leading-tight text-white group-hover:text-indigo-300 transition-colors">
             <%= exam.title %>
           </h3>
-          <p class="mb-4 text-xs text-gray-500"><%= exam.subjectName %></p>
+          <p class="mb-4 text-xs text-gray-500"><%= exam.subject %></p>
 
           <!-- Score bar -->
           <div class="mt-auto">
@@ -271,7 +276,7 @@
             <!-- Meta -->
             <div class="mt-3 flex items-center justify-between text-[11px] text-gray-500">
               <span><%= dateStr2 %></span>
-              <span><%= exam.correctAnswers %> / <%= exam.totalQuestions %> correct</span>
+              <span><%= exam.score %> / <%= exam.total_marks %> correct</span>
             </div>
 
             <!-- Passing threshold note -->
@@ -279,7 +284,7 @@
               <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
               </svg>
-              Passing: <%= exam.passingScore %>%
+              Passing Score: <%= exam.passing_score %>
             </div>
           </div>
         </a>

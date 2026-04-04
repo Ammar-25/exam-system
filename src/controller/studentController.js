@@ -291,11 +291,20 @@ const examsHistory = (req, res) => {
     .prepare("SELECT * FROM notifications WHERE user_id = ? AND read = 0")
     .all(req.user);
 
-  const exams = db.prepare(`
-    SELECT exams.id, exams.title, exams.passing_score, subjects.name as subjectName
-    FROM exams
-    JOIN subjects ON exams.subject_id = subjects.id;`
-  ).all();
+  const exams = db
+    .prepare(
+      `
+      SELECT exams.id as id, exams.total_marks, exams.duration, subjects.name as subject, exams.title, exam_sessions.start_time as date, exam_sessions.score, exams.passing_score, (exam_sessions.score >= passing_score) as result
+      FROM exam_sessions
+      JOIN exams on exams.id = exam_sessions.exam_id
+      JOIN subjects on exams.subject_id = subjects.id
+      WHERE exam_sessions.student_id = ?
+      ORDER BY exam_sessions.start_time DESC
+    `,
+    )
+    .all(req.user);
+
+  console.log(exams);
 
   return res.render("student/student-exams-history", {
     user: user,
