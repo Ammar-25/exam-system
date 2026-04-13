@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --env-file=.env --experimental-strip-types --experimental-sqlite ./src/server",
+    "tailwind": "npx @tailwindcss/cli -i ./public/tailwind.css -o ./public/output.css --watch",
+    "seeder": "node --experimental-sqlite seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -23,6 +25,6 @@
   "devDependencies": {
     "autoprefixer": "^10.4.27",
     "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.2"
   }
 }

@@ -5,6 +5,7 @@ import authRoutes from "./routes/AuthRoutes.js";
 import cookieParser from "cookie-parser";
 import authController from "../src/controller/authController.js";
 import studentRouter from "./routes/studentRoutes.js";
+import verifyGuest from "./middleware/guestMiddleware.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.get("/", (req, res) => {
+app.get("/", verifyGuest, (req, res) => {
   res.render("index");
 });
 
